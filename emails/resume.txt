@@ -1,0 +1,4 @@
+Email: {{=it.email}}
+Name: {{=it.name}}
+Phone Number: {{=it.phoneNumber}}
+Resume: {{=it.resume}}
