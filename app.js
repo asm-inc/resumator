@@ -19,7 +19,7 @@ app.use(function *(next) {
   } catch(error) {
     console.log(error);
     this.status = error.status || 500;
-    this.body = error.message;
+    this.body = error;
   }
 });
 

@@ -16,8 +16,8 @@ var Emails = {
 };
 
 Resumes.create = function *(request) {
-  if(!request) {
-    throw { status: 422, message: "Cannot be blank" }
+  if(!request || Object.keys(request).length === 0) {
+    throw { status: 422, message: "Request must be in the form of { name, email, phoneNumber, resume }" }
   }
 
   var name = request.name;
@@ -26,19 +26,19 @@ Resumes.create = function *(request) {
   var resume = request.resume;
 
   if(!name) {
-    throw { status: 422, message: "name is required." }
+    throw { status: 422, message: "name is required", request }
   }
 
   if(!validator.isEmail(email)) {
-    throw { status: 422, message: "A valid email is required" }
+    throw { status: 422, message: "A valid email is required", request }
   }
 
   if(!validator.isMobilePhone(phoneNumber, "en-US")) {
-    throw { status: 422, message: "A valid phoneNumber is required" }
+    throw { status: 422, message: "A valid phoneNumber is required", request }
   }
 
   if(!resume || resume.length > MAX_RESUME_LENGTH) {
-    throw { status: 422, message: "resume is required" }
+    throw { status: 422, message: "resume is required", request }
   }
 
   var data = {
@@ -57,7 +57,7 @@ Resumes.create = function *(request) {
   // Send email
   var result = yield emails.send(config.app.toAddress, config.app.fromAddress, `New resume from ${name}`, text, html);
   console.log(result);
-  return { message: "Thanks for sending us your resume, we will get back to you shortly" }
+  return { message: "Thanks for sending us your resume, " + request.name + ". We will get back to you shortly.", request: data }
 };
 
 module.exports = Resumes;

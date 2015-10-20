@@ -8,6 +8,7 @@ var ResumesController = {
     ];
   },
   create: function *() {
+    this.set("Content-Type", "application/json");
     this.body = yield Resumes.create(this.request.body);
   },
   ping: function *() {
