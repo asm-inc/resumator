@@ -1,5 +1,3 @@
 # resumator
 
-@swlkr actually wrote this.
-
-Testing notifications...
+Notifications work. Now testing pull requests...
