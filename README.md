@@ -1,5 +1,3 @@
 # resumator
 
-@swlkr actually wrote this.
-
-Testing notifications...
+This should make the *Merge Pull Request* disappear.
