@@ -55,7 +55,7 @@ Resumes.create = function *(request) {
   var html = files.merge(htmlTemplate, data);
 
   // Send email
-  var result = yield emails.send(config.app.toAddress, config.app.fromAddress, `New resume from ${name}`, text, html);
+  var result = yield emails.send(config.app.toAddress.split(';'), config.app.fromAddress, `New resume from ${name}`, text, html);
   console.log(result);
   return { message: "Thanks for sending us your resume, " + request.name + ". We will get back to you shortly.", request: data }
 };

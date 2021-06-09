@@ -1,5 +1,5 @@
 var config   = require("../config"),
-    sendgrid = require("sendgrid")(config.sendgrid.username, config.sendgrid.password);
+    sendgrid = require("sendgrid")(config.sendgrid.password);
 
 var Emails = {};
 
