@@ -1,7 +1,8 @@
 var config    = require("../config"),
     validator = require("validator"),
     emails    = require("./emails"),
-    files     = require("./files");
+    files     = require("./files"),
+    Auth      = require("./auth");
 
 var MAX_RESUME_LENGTH = 777;
 var MAX_NAME_LENGTH = 30;
@@ -15,13 +16,29 @@ var Emails = {
   }
 };
 
-Resumes.create = function *(request) {
+Resumes.create = function *(request, httpReq) {
   if(!request || Object.keys(request).length === 0) {
     throw { status: 422, message: "Request must be in the form of { name, email, phoneNumber, resume }" }
   }
 
-  var name = request.name;
+  if(!httpReq || !httpReq.headers) {
+    throw { status: 401, message: "You are not authorized to access this resource. Please authenticate and try again." }
+  }
+
   var email = request.email;
+  var auth = httpReq.headers["authorization"];
+  if(!auth || !email) {
+    throw { status: 401, message: "You are not authorized to access this resource. Please authenticate and try again." }
+  }
+
+  // Handle Bearer prefix
+  auth = auth.replace(/Bearer /gi, "");
+  var expectedToken = Auth.getToken(email);
+  if(auth != expectedToken) {
+    throw { status: 401, message: "Invalid token. Please authenticate and try again." }
+  }
+
+  var name = request.name;
   var phoneNumber = request.phoneNumber;
   var resume = request.resume;
 
