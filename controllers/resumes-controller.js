@@ -14,8 +14,9 @@ var ResumesController = {
     this.body = yield Resumes.create(this.request.body, this.request);
   },
   auth: function *() {
+    console.log(this.request.body);
     this.set("Content-Type", "application/json");
-    this.body = yield Auth.authenticate(this.request.body);
+    this.body = yield Auth.authenticate(this.request.body, this.request);
   },
   ping: function *() {
     this.body = { status : "alive" };

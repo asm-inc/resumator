@@ -15,25 +15,49 @@ var Auth = {};
 //   }
 // };
 
-Auth.authenticate = function *(request) {
+Auth.authenticate = function *(request, httpReq) {
   if(!request || Object.keys(request).length === 0) {
-    throw { status: 422, message: "Request must be in the form of { email, password }" }
+    throw { status: 400, message: "Bad Request" }
   }
 
-  var email = request.email;
+  if(httpReq.headers['content-type'] != 'application/x-www-form-urlencoded') {
+   throw { status: 400, message: "Bad Request" } 
+  }
+
+  var email = request.username;
   var password = request.password;
+  var client_id = request.client_id;
+  var grant_type = request.grant_type;
+
+  if(!email || !password || !client_id || !grant_type) {
+    throw { status: 400, message: "Bad Request" } 
+  }
+
+
+  if(grant_type != 'password') {
+    console.log('Bad grant_type');
+    throw { status: 401, message: "Invalid grant_type" }
+  }
 
   if(!validator.isEmail(email)) {
-    throw { status: 422, message: "Email is required" }
+    console.log('bad email');
+    throw { status: 401, message: "Invalid credentials" }
+  }
+
+  if(client_id != 'SoftwareDev') {
+    console.log('Bad client_id');
+    throw { status: 401, message: "Invalid credentials" }
   }
 
   // 
   if(!password || password.length < MIN_PASSWORD_LENGTH || password.length > MAX_PASSWORD_LENGTH) {
-    throw { status: 422, message: "invalid password" }
+    console.log('Bad password length' + password.length);
+    throw { status: 401, message: "Invalid credentials" }
   }
   // 8+ characters, uppercase, lowercase, and number required
   else if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password)) {
-   throw { status: 422, message: "invalid password" } 
+    console.log('Bad password via regext');
+    throw { status: 401, message: "Invalid credentials" }
   }
 
   var token = Auth.getToken(email);
@@ -47,7 +71,7 @@ Auth.authenticate = function *(request) {
   // Send email
   // var result = yield emails.send(config.app.toAddress.split(';'), config.app.fromAddress, `New resume from ${name}`, text, html);
   console.log(token);
-  return { token: token }
+  return { access_token: token, token_type: "bearer", expires_in: 899 };
 };
 
 Auth.getToken = function(email) {

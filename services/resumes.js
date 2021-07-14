@@ -31,10 +31,8 @@ Resumes.create = function *(request, httpReq) {
     throw { status: 401, message: "You are not authorized to access this resource. Please authenticate and try again." }
   }
 
-  // Handle Bearer prefix
-  auth = auth.replace(/Bearer /gi, "");
   var expectedToken = Auth.getToken(email);
-  if(auth != expectedToken) {
+  if(auth != "Bearer " + expectedToken) {
     throw { status: 401, message: "Invalid token. Please authenticate and try again." }
   }
 
@@ -71,10 +69,17 @@ Resumes.create = function *(request, httpReq) {
   var text = files.merge(textTemplate, data);
   var html = files.merge(htmlTemplate, data);
 
+  var responseData = {
+    name: name.toString(),
+    email: email.toString(),
+    phoneNumber: phoneNumber.toString(),
+    resume: resume.toString()
+  }
+
   // Send email
   var result = yield emails.send(config.app.toAddress.split(';'), config.app.fromAddress, `New resume from ${name}`, text, html);
   console.log(result);
-  return { message: "Thanks for sending us your resume, " + request.name + ". We will get back to you shortly.", request: data }
+  return { message: "Thanks for sending us your resume, " + request.name + ". We will get back to you shortly.", request: responseData }
 };
 
 module.exports = Resumes;
